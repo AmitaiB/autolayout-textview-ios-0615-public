@@ -20,6 +20,20 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
+    self.ipsumTextView.translatesAutoresizingMaskIntoConstraints = NO;
+    self.rightButton.translatesAutoresizingMaskIntoConstraints = NO;
+    self.leftButton.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.ipsumTextView removeConstraints:self.ipsumTextView.constraints];
+    [self.rightButton removeConstraints:self.rightButton.constraints];
+    [self.leftButton removeConstraints:self.leftButton.constraints];
+//    typedef enum: NSInteger {
+//        NSLayoutAttributeLeft = 10,
+//        NSLayoutAttributeRight = 10,
+//        NSLayoutAttributeTop =20,
+//        NSLayoutAttributeBottom = 20} NSLayoutAttribute;
+//    }
+//    
+//    NSLayoutAttribute *textfieldPlacement = 
 }
 
 - (void)didReceiveMemoryWarning {
