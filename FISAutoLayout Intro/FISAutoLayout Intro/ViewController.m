@@ -7,6 +7,7 @@
 //
 
 #import "ViewController.h"
+#import <sys/utsname.h>
 
 @interface ViewController ()
 
@@ -15,6 +16,7 @@
 @property (weak, nonatomic) IBOutlet UIButton *leftButton;
 
 @property (nonatomic, strong) NSLayoutConstraint *textfieldBottomConstraint; /// Needs to be a property because it changes dynamically with orientation.
+@property (nonatomic, strong) NSString *machineName;
 
 @end
 
@@ -22,6 +24,8 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    [self setDeviceModelVersion];
     
     [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
     NSNotificationCenter* notifCenter = [NSNotificationCenter defaultCenter];
@@ -122,14 +126,30 @@
 
 -(void)orientationChanged:(NSNotification*)notification {
     UIDevice *thisPhone = notification.object;
+    
+    if ([self.machineName isEqualToString:@"iPhone 4,1"]) {
+        self.textfieldBottomConstraint.constant = -30;
+        return;
+    }
+    
     if (UIDeviceOrientationIsPortrait(thisPhone.orientation)) {
         self.textfieldBottomConstraint.constant = -20.0;
         NSLog(@"I'm 20! (portrait)");
+        NSLog(@"This is an: %@", self.machineName);
     } else if (UIDeviceOrientationIsLandscape(thisPhone.orientation)) {
         self.textfieldBottomConstraint.constant = -10.0; 
         NSLog(@"I'm 10! (landscape)");
     } else return;
     
+}
+
+
+-(void)setDeviceModelVersion {
+    struct utsname systemInfo;
+    uname(&systemInfo);
+    
+    self.machineName = [NSString stringWithCString:systemInfo.machine
+                                          encoding:NSUTF8StringEncoding];
 }
 
 - (void)didReceiveMemoryWarning {
