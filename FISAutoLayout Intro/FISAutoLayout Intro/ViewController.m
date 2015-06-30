@@ -8,6 +8,8 @@
 
 #import "ViewController.h"
 #import <sys/utsname.h>
+#define IsIphone4 (fabs((double)[[UIScreen mainScreen]bounds].size.height - (double)480) < DBL_EPSILON)
+
 
 @interface ViewController ()
 
@@ -127,7 +129,12 @@
 -(void)orientationChanged:(NSNotification*)notification {
     UIDevice *thisPhone = notification.object;
     
-    if ([self.machineName isEqualToString:@"iPhone 4,1"]) {
+    /**
+     *  I added two checks to see if it is an iPhone4/4s
+     */
+    
+    if ([self.machineName hasPrefix:@"iPhone 4"]
+        && IsIphone4) {
         self.textfieldBottomConstraint.constant = -30;
         return;
     }
