@@ -14,13 +14,25 @@
 @property (weak, nonatomic) IBOutlet UIButton *rightButton;
 @property (weak, nonatomic) IBOutlet UIButton *leftButton;
 
+@property (nonatomic, strong) NSLayoutConstraint *textfieldBottomConstraint; /// Needs to be a property because it changes dynamically with orientation.
+
 @end
 
 @implementation ViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view, typically from a nib.
+    
+    [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
+    NSNotificationCenter* notifCenter = [NSNotificationCenter defaultCenter];
+    [notifCenter addObserver:self
+                    selector:@selector(orientationChanged:)
+                        name:UIDeviceOrientationDidChangeNotification
+                      object:nil];
+
+    /**
+     *  Prepares the views for new constraints.
+     */
     self.view.translatesAutoresizingMaskIntoConstraints = NO;
     self.ipsumTextView.translatesAutoresizingMaskIntoConstraints = NO;
     self.rightButton.translatesAutoresizingMaskIntoConstraints = NO;
@@ -30,7 +42,7 @@
     [self.rightButton removeConstraints:self.rightButton.constraints];
     [self.leftButton removeConstraints:self.leftButton.constraints];
 
-    /// item1's attribute = item2's attribute * multiplier + constant
+    // item1's attribute = item2's attribute * multiplier + constant
     /// UITextfield's placement withint the Scrollview.
     NSLayoutConstraint *textfieldPlacementLeft = [NSLayoutConstraint constraintWithItem:self.ipsumTextView
                                                                               attribute:NSLayoutAttributeLeft
@@ -54,13 +66,13 @@
                                                                               multiplier:1.0
                                                                                 constant:20.0];
     
-    NSLayoutConstraint *textfieldPlacementBottom = [NSLayoutConstraint constraintWithItem:self.ipsumTextView
-                                                                                attribute:NSLayoutAttributeBottom 
-                                                                                relatedBy:NSLayoutRelationEqual
-                                                                                   toItem:self.rightButton
-                                                                                attribute:NSLayoutAttributeTop
-                                                                               multiplier:1.0
-                                                                                 constant:-20.0];
+    self.textfieldBottomConstraint = [NSLayoutConstraint constraintWithItem:self.ipsumTextView
+                                                                  attribute:NSLayoutAttributeBottom 
+                                                                  relatedBy:NSLayoutRelationEqual
+                                                                     toItem:self.rightButton
+                                                                  attribute:NSLayoutAttributeTop
+                                                                 multiplier:1.0
+                                                                   constant:-20.0];
     
     /**
      *  Button(s) constraints
@@ -101,20 +113,23 @@
     [self.view addConstraint:textfieldPlacementLeft];
     [self.view addConstraint:textfieldPlacementRight];
     [self.view addConstraint:textfieldPlacementTop];
-    [self.view addConstraint:textfieldPlacementBottom];
+    [self.view addConstraint:self.textfieldBottomConstraint];
     [self.view addConstraint:rightButtonRight];
     [self.view addConstraint:rightButtonBottom];
     [self.view addConstraint:leftButtonLeft];
     [self.view addConstraint:leftButtonBottom];
+}
+
+-(void)orientationChanged:(NSNotification*)notification {
+    UIDevice *thisPhone = notification.object;
+    if (UIDeviceOrientationIsPortrait(thisPhone.orientation)) {
+        self.textfieldBottomConstraint.constant = -20.0;
+        NSLog(@"I'm 20! (portrait)");
+    } else if (UIDeviceOrientationIsLandscape(thisPhone.orientation)) {
+        self.textfieldBottomConstraint.constant = -10.0; 
+        NSLog(@"I'm 10! (landscape)");
+    } else return;
     
-    //    typedef enum: NSInteger {
-//        NSLayoutAttributeLeft = 10,
-//        NSLayoutAttributeRight = 10,
-//        NSLayoutAttributeTop =20,
-//        NSLayoutAttributeBottom = 20} NSLayoutAttribute;
-//    }
-//    
-//    NSLayoutAttribute *textfieldPlacement = 
 }
 
 - (void)didReceiveMemoryWarning {
